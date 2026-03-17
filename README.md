@@ -64,7 +64,3 @@ PetCare is a Kotlin Android app that helps pet owners manage animal profiles, he
 
 - Keep secrets out of source control.
 - Requires network access to Supabase.
-
-## 🐾 License
-
-MIT
