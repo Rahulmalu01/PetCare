@@ -1,0 +1,11 @@
+## This file must *NOT* be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Location of the SDK. This is only used by Gradle.
+# For customization when using a Version Control System, please read the
+# header note.
+#Wed Mar 18 01:00:04 IST 2026
+sdk.dir=C\:\\Users\\rahul\\AppData\\Local\\Android\\Sdk
+api.key=YOUR_SUPABASE_ANON_KEY
+api.url=YOUR_SUPABASE_PROJECT_URL
+server.client.id=YOUR_GOOGLE_SERVER_CLIENT_ID
