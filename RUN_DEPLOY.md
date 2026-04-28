@@ -56,6 +56,40 @@ CREATE TABLE reminders (
 );
 ```
 
+**2b. Run the doctor/vitals migration** — open `supabase/migrations/001_doctors_and_seed.sql` and execute it in the SQL Editor. This creates:
+
+| Table | Purpose |
+|---|---|
+| `doctors` | Veterinarian profiles linked to `auth.users` |
+| `pet_doctor_assignments` | Many-to-many pet↔doctor relationships |
+| `pet_vitals` | Live IoT/wearable vitals readings |
+
+It also seeds 5 demo pets, 3 demo doctors, health records, reminders, and vitals entries for the demo owner account (`123e4567-e89b-12d3-a456-426614174000`).
+
+> **Note**: The seed data uses the demo user ID baked into the app (`demoUser` in `User.kt`). For real accounts, update the `owner_id` values in the SQL.
+
+---
+
+## Live Data API (IoT / Wearables)
+
+A Supabase Edge Function at `supabase/functions/ingest-pet-data/` exposes:
+
+```
+POST https://<PROJECT_REF>.supabase.co/functions/v1/ingest-pet-data
+```
+
+Deploy it with:
+
+```bash
+supabase link --project-ref <YOUR_PROJECT_REF>
+supabase secrets set DEVICE_API_KEY=your-secret-key
+supabase functions deploy ingest-pet-data
+```
+
+See `supabase/functions/ingest-pet-data/README.md` for the full JSON schema, field reference, cURL examples, and response codes.
+
+---
+
 3.  Enable Google Auth in Supabase (Authentication -> Providers -> Google).
 
 ## Local Configuration

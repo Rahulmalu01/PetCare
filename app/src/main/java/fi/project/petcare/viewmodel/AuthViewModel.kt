@@ -64,17 +64,12 @@ class AuthViewModel: ViewModel() {
                                 )
                             }
 
-                            SessionSource.AnonymousSignIn -> TODO()
-                            SessionSource.External -> TODO()
-                            is SessionSource.Refresh ->
-                                _authUiState.value = AuthUiState.Authenticated(
-                                    User(
-                                        id = sessionStatus.session.user?.id.toString(),
-                                        name = sessionStatus
-                                            .session.user?.userMetadata?.get("full_name").toString(),
-                                        email = sessionStatus.session.user?.email.toString()
-                                    )
-                                )
+                            SessionSource.AnonymousSignIn,
+                            SessionSource.External,
+                            SessionSource.Unknown,
+                            is SessionSource.UserChanged,
+                            is SessionSource.UserIdentitiesChanged,
+                            is SessionSource.Refresh,
                             is SessionSource.SignIn -> {
                                 _authUiState.value = AuthUiState.Authenticated(
                                     User(
@@ -85,9 +80,6 @@ class AuthViewModel: ViewModel() {
                                     )
                                 )
                             }
-                            SessionSource.Unknown -> TODO()
-                            is SessionSource.UserChanged -> TODO()
-                            is SessionSource.UserIdentitiesChanged -> TODO()
                         }
                     }
                     is SessionStatus.NetworkError -> {

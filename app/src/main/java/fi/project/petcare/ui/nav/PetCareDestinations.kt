@@ -24,6 +24,9 @@ sealed class Screen(val route: String, val unselectedIcon: ImageVector? = null, 
     }
     object PetProfile : Screen(route = "PetProfile", unselectedIcon = Icons.Outlined.Pets)
     object Settings : Screen(route = "Settings", unselectedIcon = Icons.Outlined.Settings, selectedIcon = Icons.Filled.Settings)
+    object DoctorDashboard : Screen(route = "DoctorDashboard")
+    /** Route: "DoctorPatientDetail/{petId}" */
+    object DoctorPatientDetail : Screen(route = "DoctorPatientDetail")
 }
 
 // Screens to be displayed in bottom nav bar

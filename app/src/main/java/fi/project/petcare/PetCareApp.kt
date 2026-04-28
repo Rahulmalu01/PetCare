@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -16,11 +17,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import fi.project.petcare.ui.composables.LoadingIndicator
 import fi.project.petcare.ui.nav.NavGraph
+import fi.project.petcare.ui.nav.Screen
 import fi.project.petcare.ui.screens.WelcomeScreen
 import fi.project.petcare.ui.theme.PetCareTheme
 import fi.project.petcare.ui.theme.bg_gr
 import fi.project.petcare.viewmodel.AuthUiState
 import fi.project.petcare.viewmodel.AuthViewModel
+import fi.project.petcare.viewmodel.DoctorUiState
+import fi.project.petcare.viewmodel.DoctorViewModel
 import fi.project.petcare.viewmodel.PetViewModel
 import fi.project.petcare.viewmodel.ReminderViewModel
 import kotlinx.coroutines.launch
@@ -33,11 +37,8 @@ fun PetCareApp() {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val dynamicColors = false
 
-    PetCareTheme (
-        dynamicColor = dynamicColors
-    ) {
+    PetCareTheme(dynamicColor = false) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
@@ -46,29 +47,46 @@ fun PetCareApp() {
                 is AuthUiState.Unauthenticated -> {
                     WelcomeScreen(vModel = authViewModel, snackbarHostState = snackbarHostState)
                 }
+
                 is AuthUiState.Loading -> {
                     LoadingIndicator(
                         modifier = Modifier.aspectRatio(1f),
                         color = bg_gr
                     )
                 }
+
                 is AuthUiState.Authenticated -> {
-                    // Dashboard
                     val petViewModel: PetViewModel = viewModel()
                     val reminderViewModel: ReminderViewModel = viewModel()
+                    val doctorViewModel: DoctorViewModel = viewModel()
+                    val doctorState by doctorViewModel.doctorUiState.collectAsState()
+
+                    // Once doctor role is resolved, route accordingly
+                    LaunchedEffect(doctorState) {
+                        when (doctorState) {
+                            is DoctorUiState.DoctorAuthenticated -> {
+                                navController.navigate(Screen.DoctorDashboard.route) {
+                                    popUpTo(Screen.Dashboard.Home.route) { inclusive = true }
+                                }
+                            }
+                            // NotADoctor or Error → stay on default owner dashboard
+                            else -> Unit
+                        }
+                    }
+
                     NavGraph(
                         navController = navController,
                         authViewModel = authViewModel,
                         petViewModel = petViewModel,
-                        reminderViewModel = reminderViewModel
+                        reminderViewModel = reminderViewModel,
+                        doctorViewModel = doctorViewModel
                     )
                 }
+
                 is AuthUiState.Error -> {
                     val errorMessage = (authState as AuthUiState.Error).message
                     scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = errorMessage,
-                        )
+                        snackbarHostState.showSnackbar(message = errorMessage)
                     }
                     WelcomeScreen(vModel = authViewModel, snackbarHostState = snackbarHostState)
                 }
